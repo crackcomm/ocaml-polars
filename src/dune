@@ -1,0 +1,31 @@
+(rule
+ (targets libpolars_ocaml.a dllpolars_ocaml.so)
+ (deps Cargo.toml (glob_files *.rs))
+ (action
+  (progn
+   (run sh -c
+    "cd %{project_root}/../../src && cargo build -p polars-ocaml --release --lib")
+   (run sh -c
+    "mv %{project_root}/../../target/release/libpolars_ocaml.so ./dllpolars_ocaml.so 2> /dev/null || mv %{project_root}/../../target/release/libpolars_ocaml.dylib ./dllpolars_ocaml.so")
+   (run mv %{project_root}/../../target/release/libpolars_ocaml.a
+     libpolars_ocaml.a))))
+
+(library
+ (name polars)
+ (modules polars polars0 types any_bigarray)
+ (public_name polars)
+ (libraries core async)
+ (foreign_archives polars_ocaml)
+ (c_library_flags
+  (:standard -lpthread -lc -lm))
+ (preprocess
+  (pps ppx_jane ppx_typed_fields)))
+
+(library
+ (name polars_lazy)
+ (modules polars_lazy)
+ (public_name polars.lazy)
+ (libraries polars)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))

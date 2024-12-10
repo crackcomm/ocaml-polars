@@ -1,0 +1,23 @@
+; (library
+;  (name polars_testdata)
+;  (modules polars_testdata)
+;  (public_name ocxmr.polars_testdata)
+;  (libraries ocxmr_core.test_util ocxmr.polars))
+
+(library
+ (name polars_test)
+ (modules
+  polars_test
+  polars_lazy_test
+  polars_testdata
+  polars_testing)
+ (libraries polars.lazy) ; polars_testing)
+ (inline_tests)
+ (preprocess
+  (pps ppx_jane)))
+
+; (library
+;  (name polars_testing)
+;  (modules polars_testing)
+;  ; (public_name ocxmr.polars_testing)
+;  (libraries polars))
