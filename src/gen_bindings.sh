@@ -15,4 +15,5 @@ rust_to_ocaml \
   --config rust_to_ocaml.toml \
   types.rs >>types.ml
 
-ocamlformat -i types.ml
+# run ocamlformat if installed
+which ocamlformat && ocamlformat -i types.ml

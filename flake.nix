@@ -15,12 +15,9 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = (nixpkgs.makePkgs { inherit system; }).extend (self: super: {
-          ocamlPackages = import ./nix/ocaml.nix {
-            inherit (super) ocaml-ng fetchFromGitHub;
-            pkgs = super;
-          };
+          ocamlPackages = import ./nix/ocaml.nix { pkgs = super; };
         });
-      in let polars_ocaml = pkgs.callPackage ./nix { inherit nix-filter; };
+      in let ocaml-polars = pkgs.callPackage ./nix { inherit nix-filter; };
       in let
         # TODO: different platforms
         rustToolchain = (fenix.packages.x86_64-linux.toolchainOf {
@@ -29,8 +26,8 @@
           sha256 = "sha256-lmQQppk1opfsDa+37lYNHvOwC5CXgIInS7pAnLoMSKM=";
         }).minimalToolchain;
       in {
-        packages = { inherit polars_ocaml rustToolchain; };
+        packages = { inherit ocaml-polars; };
         devShell =
-          import ./nix/shell.nix { inherit pkgs polars_ocaml rustToolchain; };
+          import ./nix/shell.nix { inherit pkgs ocaml-polars rustToolchain; };
       });
 }
