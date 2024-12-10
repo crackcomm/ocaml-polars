@@ -1,0 +1,10 @@
+[types]
+transparent = ["Box", "Arc"]
+rename = [
+  ["Vec", "array"],
+  ["f64", "float"],
+  ["f32", "float"],
+  ["SeriesPtr", "Polars0.series"],
+  ["DataFramePtr", "Polars0.t"],
+  ["LazyFramePtr", "Polars0.lazy_frame"],
+]

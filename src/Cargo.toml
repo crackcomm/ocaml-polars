@@ -1,0 +1,60 @@
+[package]
+name = "polars-ocaml"
+version = "0.0.1"
+authors = ["Łukasz Kurowski <crackcomm@gmail.com>"]
+edition = "2021"
+license = "MIT"
+description = "Polars DataFrame in OCaml."
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+path = "lib.rs"
+crate-type = ["lib", "staticlib", "cdylib"]
+
+[dependencies]
+polars = { version = "0.39.2", default-features = false, features = [
+  "ndarray",
+  "parquet",
+  "csv",
+  "fmt",
+  "lazy",
+  "temporal",
+  "rolling_window",
+  "abs",
+  "log",
+  "cum_agg",
+  "round_series",
+] }
+polars-plan = "0.39.2"
+ndarray = "0.15.6"
+
+[dependencies.ocaml-derive]
+git = "https://github.com/crackcomm/ocaml-rs.git"
+branch = "master"
+
+[dependencies.ocaml]
+git = "https://github.com/crackcomm/ocaml-rs.git"
+branch = "master"
+features = ["bigarray-ext", "ocaml5"]
+
+[dependencies.ocamlrep]
+git = "https://github.com/facebook/ocamlrep.git"
+branch = "main"
+
+[dependencies.ocamlrep_derive]
+git = "https://github.com/facebook/ocamlrep.git"
+branch = "main"
+
+[dev-dependencies]
+tokio = { version = "1.37.0", features = ["sync"] }
+phf_shared = { version = "0.11.2", features = ["std"] }
+syn = { version = "2.0.46", features = ["full", "visit-mut"] }
+futures-util = { version = "0.3.31", features = ["sink"] }
+#
+# zerocopy = { version = "0.7.35", features = [
+#   "byteorder",
+#   "default",
+#   "derive",
+#   "simd",
+#   "zerocopy-derive",
+# ] }
