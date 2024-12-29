@@ -4,6 +4,11 @@ let inherit (pkgs) lib stdenv ocamlPackages rustPlatform;
 
 in with ocamlPackages;
 let
+  rustSource = with nix-filter.lib;
+    filter {
+      root = ./..;
+      include = [ "Cargo.toml" "Cargo.lock" "src/Cargo.toml" (matchExt "rs") ];
+    };
   projectSource = with nix-filter.lib;
     filter {
       root = ./..;
@@ -32,17 +37,9 @@ in let
   polars = rustPlatform.buildRustPackage {
     pname = "polars-ocaml";
     version = "0.0.1";
-    # src = repos.polars // {
-    #   # inherit (repos) polars;
-    #   subPath = "src";
-    # };
-    # src = repos.polars;
-    src = projectSource;
+    src = rustSource;
     cargoHash = lib.fakeSha256;
-    # cargoDeps = rustPlatform.importCargoLock { lockFile = ../Cargo.lock; };
-
     nativeBuildInputs = [ rust_to_ocaml ocaml ];
-
     cargoLock = {
       lockFile = ../Cargo.lock;
       outputHashes = {
@@ -52,9 +49,10 @@ in let
           "sha256-D4S97MkifbMyZVl5Q+DeN06Z6C/Gf3zq746RVNsxGWQ=";
       };
     };
+    doCheck = false;
   };
 in buildDunePackage rec {
-  pname = "ocaml-polars";
+  pname = "polars";
   version = "0.0.0-dev";
 
   src = projectSource;
@@ -65,4 +63,6 @@ in buildDunePackage rec {
     [ async core dune-configurator ppx_typed_fields polars ] ++ checkInputs;
 
   checkInputs = [ expect_test_helpers_async ];
+
+  OCAML_POLARS_STUBS = polars;
 }

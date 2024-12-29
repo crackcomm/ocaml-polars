@@ -1,6 +1,11 @@
 (rule
+ (enabled_if
+  (= %{env:OCAML_POLARS_STUBS=n} n))
  (targets libpolars_ocaml.a dllpolars_ocaml.so)
- (deps Cargo.toml (glob_files *.rs))
+ (deps
+  Cargo.toml
+  (glob_files *.rs)
+  (env_var OCAML_POLARS_STUBS))
  (action
   (progn
    (run sh -c
@@ -9,6 +14,17 @@
     "mv %{project_root}/../../target/release/libpolars_ocaml.so ./dllpolars_ocaml.so 2> /dev/null || mv %{project_root}/../../target/release/libpolars_ocaml.dylib ./dllpolars_ocaml.so")
    (run mv %{project_root}/../../target/release/libpolars_ocaml.a
      libpolars_ocaml.a))))
+
+(rule
+ (enabled_if
+  (<> %{env:OCAML_POLARS_STUBS=n} n))
+ (targets libpolars_ocaml.a dllpolars_ocaml.so)
+ (deps
+  (env_var OCAML_POLARS_STUBS))
+ (action
+  (progn
+   (copy %{env:OCAML_POLARS_STUBS=}/lib/libpolars_ocaml.so dllpolars_ocaml.so)
+   (copy %{env:OCAML_POLARS_STUBS=}/lib/libpolars_ocaml.a libpolars_ocaml.a))))
 
 (library
  (name polars)

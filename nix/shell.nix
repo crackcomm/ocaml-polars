@@ -16,4 +16,6 @@ mkShell {
     odoc
     # ocaml-index
   ];
+
+  buildInputs = [ ocaml-polars ];
 }

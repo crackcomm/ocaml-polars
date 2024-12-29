@@ -2,33 +2,30 @@
   description = "Nix Flake";
 
   inputs = {
-    nixpkgs.url = "github:anmonteiro/nix-overlays";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    ocaml-overlay.url = "github:anmonteiro/nix-overlays";
     nix-filter.url = "github:numtide/nix-filter";
     flake-utils.url = "github:numtide/flake-utils";
     rust-overlay.url = "github:oxalica/rust-overlay";
-    # fenix = {
-    #   url = "github:nix-community/fenix";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
   };
 
-  outputs = { self, nixpkgs, nix-filter, flake-utils, rust-overlay }:
+  outputs =
+    { self, nixpkgs, nix-filter, flake-utils, ocaml-overlay, rust-overlay }:
     flake-utils.lib.eachDefaultSystem (system:
       let
-        overlays = [ (import rust-overlay) ];
-        pkgs = (nixpkgs.makePkgs { inherit system overlays; }).extend
-          (self: super: {
-            ocamlPackages = import ./nix/ocaml.nix { pkgs = super; };
-          });
-      in let
-        ocaml-polars = pkgs.callPackage ./nix { inherit nix-filter; };
-        # in let
-        #   # TODO: different platforms
-        #   rustToolchain = (fenix.packages.x86_64-linux.toolchainOf {
-        #     channel = "nightly";
-        #     date = "2024-11-28";
-        #     sha256 = "sha256-lmQQppk1opfsDa+37lYNHvOwC5CXgIInS7pAnLoMSKM=";
-        #   }).minimalToolchain;
+        overlays = [
+          rust-overlay.overlays.default
+          ocaml-overlay.overlays.default
+          (final: prev: {
+            rustToolchain =
+              prev.rust-bin.nightly."2024-11-28".default.override {
+                targets = [ "x86_64-unknown-linux-gnu" ];
+              };
+          })
+        ];
+        pkgs = (import nixpkgs { inherit system overlays; }).extend
+          (self: super: { ocamlPackages = super.ocaml-ng.ocamlPackages_5_2; });
+        ocaml-polars = pkgs.callPackage ./nix { inherit pkgs nix-filter; };
       in {
         packages = { inherit ocaml-polars; };
         devShell = import ./nix/shell.nix { inherit pkgs ocaml-polars; };
