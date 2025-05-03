@@ -18,7 +18,7 @@
           ocaml-overlay.overlays.default
           (final: prev: {
             rustToolchain =
-              prev.rust-bin.nightly."2024-11-28".default.override {
+              prev.rust-bin.nightly."2025-04-03".default.override {
                 targets = [ "x86_64-unknown-linux-gnu" ];
               };
           })
